@@ -1,0 +1,12 @@
+stages:
+  - build
+
+build_prod:
+  stage: build
+  image: docker:latest
+  tags:
+    - linux
+  services:
+    - docker:dind
+  script:
+    - docker build docker/prod
