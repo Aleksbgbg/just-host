@@ -1,5 +1,15 @@
 stages:
   - build
+  - lint
+
+build_backend:
+  stage: build
+  image: rust:alpine
+  tags:
+    - linux
+  script:
+    - cd backend
+    - cargo build
 
 build_prod:
   stage: build
@@ -9,4 +19,24 @@ build_prod:
   services:
     - docker:dind
   script:
-    - docker build docker/prod
+    - docker build -f docker/prod/Dockerfile .
+
+format_backend:
+  stage: lint
+  image: rust:alpine
+  tags:
+    - linux
+  script:
+    - cd backend
+    - rustup component add rustfmt
+    - cargo fmt --check
+
+clippy_backend:
+  stage: lint
+  image: rust:alpine
+  tags:
+    - linux
+  script:
+    - cd backend
+    - rustup component add clippy
+    - cargo clippy -- -Dwarnings
