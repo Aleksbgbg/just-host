@@ -2,7 +2,7 @@ stages:
   - build
   - lint
 
-build_backend:
+build-backend:
   stage: build
   image: rust:alpine
   tags:
@@ -11,7 +11,7 @@ build_backend:
     - cd backend
     - cargo build
 
-build_prod:
+build-prod:
   stage: build
   image: docker:latest
   tags:
@@ -21,7 +21,7 @@ build_prod:
   script:
     - docker build -f docker/prod/Dockerfile .
 
-format_backend:
+format-backend:
   stage: lint
   image: rust:alpine
   tags:
@@ -31,7 +31,7 @@ format_backend:
     - rustup component add rustfmt
     - cargo fmt --check
 
-clippy_backend:
+clippy-backend:
   stage: lint
   image: rust:alpine
   tags:
