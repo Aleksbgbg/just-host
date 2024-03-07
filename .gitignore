@@ -1,2 +1,10 @@
-# Rust build
+# Backend
 target/
+
+# Frontend
+node_modules/
+dist/
+.eslintcache
+
+# Mac
+.DS_Store

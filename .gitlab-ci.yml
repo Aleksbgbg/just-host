@@ -13,6 +13,14 @@ build-backend:
     - cd backend
     - cargo build
 
+build-frontend:
+  stage: build
+  image: node:alpine
+  script:
+    - cd frontend
+    - npm install
+    - npm run build
+
 build-prod-image:
   stage: build
   image: docker:latest
@@ -42,3 +50,19 @@ clippy-backend:
     - cd backend
     - rustup component add clippy
     - cargo clippy -- -Dwarnings
+
+format-frontend:
+  stage: lint
+  image: node:alpine
+  script:
+    - cd frontend
+    - npm install
+    - npm run format:check
+
+lint-frontend:
+  stage: lint
+  image: node:alpine
+  script:
+    - cd frontend
+    - npm install
+    - npm run lint:check
