@@ -1,3 +1,7 @@
 [workspace]
 resolver = "2"
 members = ["just-host"]
+
+[profile.release]
+strip = true
+lto = "thin"
