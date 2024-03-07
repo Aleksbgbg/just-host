@@ -2,11 +2,13 @@ stages:
   - build
   - lint
 
+default:
+  tags:
+    - linux
+
 build-backend:
   stage: build
   image: rust:alpine
-  tags:
-    - linux
   script:
     - cd backend
     - cargo build
@@ -14,8 +16,6 @@ build-backend:
 build-prod-image:
   stage: build
   image: docker:latest
-  tags:
-    - linux
   services:
     - docker:dind
   variables:
@@ -30,8 +30,6 @@ build-prod-image:
 format-backend:
   stage: lint
   image: rust:alpine
-  tags:
-    - linux
   script:
     - cd backend
     - rustup component add rustfmt
@@ -40,8 +38,6 @@ format-backend:
 clippy-backend:
   stage: lint
   image: rust:alpine
-  tags:
-    - linux
   script:
     - cd backend
     - rustup component add clippy
