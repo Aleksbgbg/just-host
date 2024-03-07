@@ -11,15 +11,21 @@ build-backend:
     - cd backend
     - cargo build
 
-build-prod:
+build-prod-image:
   stage: build
   image: docker:latest
   tags:
     - linux
   services:
     - docker:dind
+  variables:
+    CURRENT_IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    BRANCH_IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   script:
-    - docker build -f docker/prod/Dockerfile .
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker build -t $CURRENT_IMAGE_TAG -t $BRANCH_IMAGE_TAG -f docker/prod/Dockerfile .
+    - docker push $CURRENT_IMAGE_TAG
+    - docker push $BRANCH_IMAGE_TAG
 
 format-backend:
   stage: lint
