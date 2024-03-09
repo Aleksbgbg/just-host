@@ -6,7 +6,7 @@ WORKDIR /backend
 RUN apk update && apk add --no-cache musl-dev
 
 COPY backend /backend
-RUN cargo build --release
+RUN cargo build --release --package just-host
 
 # frontend
 FROM node:alpine AS frontend

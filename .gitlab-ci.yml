@@ -1,6 +1,7 @@
 stages:
   - build
   - lint
+  - test
 
 default:
   tags:
@@ -68,3 +69,17 @@ lint-frontend:
     - cd frontend
     - npm install
     - npm run lint:check
+
+test-backend:
+  stage: test
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    FF_NETWORK_PER_BUILD: "true"
+  script:
+    - apk update && apk add --no-cache musl-dev cargo
+    - docker build -t app -f docker/prod/Dockerfile .
+    - docker run --detach -p 0.0.0.0:8601:8601 app
+    - cd backend
+    - HOSTNAME=docker cargo test

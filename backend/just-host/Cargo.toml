@@ -9,6 +9,6 @@ serde = { version = "1.0.197", default-features = false, features = ["derive"] }
 thiserror = { version = "1.0.57", default-features = false }
 tokio = { version = "1.36.0", default-features = false, features = ["macros", "net", "rt-multi-thread", "signal"] }
 toml-env = { version = "1.2.0", default-features = false }
-tower-http = { version = "0.5.2", default-features = false, features = ["trace"] }
+tower-http = { version = "0.5.2", default-features = false, features = ["fs", "trace"] }
 tracing = { version = "0.1.40", default-features = false }
 tracing-subscriber = { version = "0.3.18", default-features = false, features = ["ansi", "fmt"] }
