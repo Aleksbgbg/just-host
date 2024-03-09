@@ -16,7 +16,8 @@ enum AppError {
   LoadConfig(#[from] ConfigError),
 }
 
-fn start() -> Result<AppSuccess, AppError> {
+#[tokio::main]
+async fn start() -> Result<AppSuccess, AppError> {
   let _config = config::load()?;
 
   Ok(AppSuccess::Completed)
