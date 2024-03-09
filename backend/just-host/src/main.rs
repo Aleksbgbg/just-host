@@ -1,3 +1,6 @@
+mod config;
+
+use config::ConfigError;
 use thiserror::Error;
 use tracing::{error, info, Level};
 
@@ -8,9 +11,14 @@ enum AppSuccess {
 }
 
 #[derive(Error, Debug)]
-enum AppError {}
+enum AppError {
+  #[error("could not load config: {0}")]
+  LoadConfig(#[from] ConfigError),
+}
 
 fn start() -> Result<AppSuccess, AppError> {
+  let _config = config::load()?;
+
   Ok(AppSuccess::Completed)
 }
 
