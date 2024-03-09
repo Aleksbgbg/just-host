@@ -28,4 +28,6 @@ COPY --from=backend /backend/target/release/just-host /app/backend
 COPY --from=frontend /frontend/dist /app/frontend
 COPY backend/.env.toml /app
 
+EXPOSE 8601
+
 ENTRYPOINT ["/app/backend"]

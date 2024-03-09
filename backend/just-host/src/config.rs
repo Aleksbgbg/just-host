@@ -3,7 +3,15 @@ use thiserror::Error;
 use toml_env::Args;
 
 #[derive(Serialize, Deserialize)]
-pub struct Config {}
+pub struct Config {
+  pub app: App,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct App {
+  pub host: [u8; 4],
+  pub port: u16,
+}
 
 #[derive(Error, Debug)]
 pub enum ConfigError {

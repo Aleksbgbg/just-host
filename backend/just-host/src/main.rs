@@ -1,7 +1,11 @@
 mod config;
 
+use axum::{routing, Router};
 use config::ConfigError;
+use std::net::SocketAddr;
 use thiserror::Error;
+use tokio::net::TcpListener;
+use tower_http::trace::{DefaultMakeSpan, DefaultOnResponse, TraceLayer};
 use tracing::{error, info, Level};
 
 #[derive(Error, Debug)]
@@ -14,11 +18,39 @@ enum AppSuccess {
 enum AppError {
   #[error("could not load config: {0}")]
   LoadConfig(#[from] ConfigError),
+  #[error("could not bind to network interface: {0}")]
+  BindTcpListener(std::io::Error),
+  #[error("could not get TCP listener address: {0}")]
+  GetListenerAddress(std::io::Error),
+  #[error("could not start Axum server: {0}")]
+  ServeApp(std::io::Error),
 }
 
 #[tokio::main]
 async fn start() -> Result<AppSuccess, AppError> {
-  let _config = config::load()?;
+  let config = config::load()?;
+
+  let listener = TcpListener::bind(SocketAddr::from((config.app.host, config.app.port)))
+    .await
+    .map_err(AppError::BindTcpListener)?;
+
+  let api = Router::new().route("/hello", routing::get(|| async { "Hello, world!" }));
+  let app = Router::new().nest("/api", api).layer(
+    TraceLayer::new_for_http()
+      .make_span_with(DefaultMakeSpan::new().level(Level::INFO))
+      .on_response(DefaultOnResponse::new().level(Level::INFO)),
+  );
+
+  info!(
+    "backend listening on {}",
+    listener
+      .local_addr()
+      .map_err(AppError::GetListenerAddress)?
+  );
+
+  axum::serve(listener, app)
+    .await
+    .map_err(AppError::ServeApp)?;
 
   Ok(AppSuccess::Completed)
 }
