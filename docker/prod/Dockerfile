@@ -3,8 +3,9 @@ FROM rust:alpine AS backend
 
 WORKDIR /backend
 
-COPY backend /backend
+RUN apk update && apk add --no-cache musl-dev
 
+COPY backend /backend
 RUN cargo build --release
 
 # frontend

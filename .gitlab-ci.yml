@@ -10,6 +10,7 @@ build-backend:
   stage: build
   image: rust:alpine
   script:
+    - apk update && apk add --no-cache musl-dev
     - cd backend
     - cargo build
 
@@ -47,6 +48,7 @@ clippy-backend:
   stage: lint
   image: rust:alpine
   script:
+    - apk update && apk add --no-cache musl-dev
     - cd backend
     - rustup component add clippy
     - cargo clippy -- -Dwarnings
