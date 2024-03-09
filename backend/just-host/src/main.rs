@@ -5,6 +5,7 @@ use config::ConfigError;
 use std::net::SocketAddr;
 use thiserror::Error;
 use tokio::net::TcpListener;
+use tokio::{select, signal};
 use tower_http::trace::{DefaultMakeSpan, DefaultOnResponse, TraceLayer};
 use tracing::{error, info, Level};
 
@@ -49,6 +50,7 @@ async fn start() -> Result<AppSuccess, AppError> {
   );
 
   axum::serve(listener, app)
+    .with_graceful_shutdown(shutdown_signal())
     .await
     .map_err(AppError::ServeApp)?;
 
@@ -67,5 +69,28 @@ fn main() {
   match start() {
     Ok(success) => info!("app exited successfully: {}", success),
     Err(err) => error!("app exited due to error: {}", err),
+  }
+}
+
+async fn shutdown_signal() {
+  let ctrl_c = async {
+    signal::ctrl_c()
+      .await
+      .expect("failed to install Ctrl+C handler");
+  };
+
+  #[cfg(unix)]
+  let terminate = async {
+    signal::unix::signal(signal::unix::SignalKind::terminate())
+      .expect("failed to install SIGTERM handler")
+      .recv()
+      .await;
+  };
+  #[cfg(not(unix))]
+  let terminate = std::future::pending::<()>();
+
+  select! {
+    _ = ctrl_c => {},
+    _ = terminate => {},
   }
 }
