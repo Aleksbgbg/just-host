@@ -11,7 +11,7 @@ build-backend:
   stage: build
   image: rust:alpine
   script:
-    - apk update && apk add --no-cache musl-dev
+    - apk add --update --no-cache musl-dev
     - cd backend
     - cargo build
 
@@ -51,7 +51,7 @@ clippy-backend:
   image: rust:alpine
   needs: []
   script:
-    - apk update && apk add --no-cache musl-dev
+    - apk add --update --no-cache musl-dev
     - cd backend
     - rustup component add clippy
     - cargo clippy -- -Dwarnings
@@ -83,7 +83,7 @@ test-backend:
   variables:
     FF_NETWORK_PER_BUILD: "true"
   script:
-    - apk update && apk add --no-cache musl-dev cargo
+    - apk add --update --no-cache musl-dev cargo
     - docker build -t app -f docker/prod/Dockerfile .
     - docker run --detach -p 0.0.0.0:8601:8601 app
     - cd backend

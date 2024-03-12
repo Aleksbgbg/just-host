@@ -3,7 +3,7 @@ FROM rust:alpine AS backend
 
 WORKDIR /backend
 
-RUN apk update && apk add --no-cache musl-dev
+RUN apk add --update --no-cache musl-dev
 
 COPY backend /backend
 RUN cargo build --release --package just-host
