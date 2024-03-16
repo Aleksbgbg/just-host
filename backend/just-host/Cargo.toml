@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 axum = { version = "0.7.4", default-features = false, features = ["http1", "tokio"] }
 serde = { version = "1.0.197", default-features = false, features = ["derive"] }
+serde_json = { version = "1.0.114", default-features = false, features = ["alloc"] }
 thiserror = { version = "1.0.57", default-features = false }
 tokio = { version = "1.36.0", default-features = false, features = ["macros", "net", "rt-multi-thread", "signal"] }
 toml-env = { version = "1.2.0", default-features = false }

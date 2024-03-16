@@ -1,5 +1,8 @@
 mod config;
+mod controllers;
 
+use crate::controllers::errors::HandlerError;
+use axum::extract::Path;
 use axum::{routing, Router};
 use config::ConfigError;
 use std::net::SocketAddr;
@@ -36,7 +39,16 @@ async fn start() -> Result<AppSuccess, AppError> {
     .await
     .map_err(AppError::BindTcpListener)?;
 
-  let api = Router::new().route("/hello", routing::get(|| async { "Hello, world!" }));
+  let api = Router::new().route(
+    "/hello/:param",
+    routing::get(|Path(param): Path<u32>| async move {
+      if param == 0 {
+        Ok(())
+      } else {
+        Err(HandlerError::Empty)
+      }
+    }),
+  );
   let app = Router::new()
     .nest_service("/", ServeDir::new("frontend"))
     .nest("/api", api)
