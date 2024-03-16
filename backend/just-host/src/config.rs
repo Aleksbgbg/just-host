@@ -6,12 +6,31 @@ use thiserror::Error;
 #[derive(Deserialize)]
 pub struct Config {
   pub app: App,
+  pub database: Database,
 }
 
 #[derive(Deserialize)]
 pub struct App {
   pub host: [u8; 4],
   pub port: u16,
+}
+
+#[derive(Deserialize)]
+pub struct Database {
+  pub host: String,
+  pub port: u16,
+  pub username: String,
+  pub password: String,
+  pub database: String,
+}
+
+impl Database {
+  pub fn connection_string(&self) -> String {
+    format!(
+      "postgres://{}:{}@{}:{}/{}",
+      self.username, self.password, self.host, self.port, self.database
+    )
+  }
 }
 
 #[derive(Error, Debug)]

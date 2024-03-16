@@ -3,10 +3,10 @@ FROM rust:alpine AS backend
 
 WORKDIR /backend
 
-RUN apk add --update --no-cache musl-dev
+RUN apk add --update --no-cache musl-dev libpq-dev
 
 COPY backend /backend
-RUN cargo build --release --package just-host
+RUN RUSTFLAGS="-C target-feature=-crt-static" cargo build --release --package just-host
 
 # frontend
 FROM node:alpine AS frontend
@@ -23,6 +23,8 @@ RUN npm run build
 FROM alpine:latest
 
 WORKDIR /app
+
+RUN apk add --update --no-cache libc++ libpq
 
 COPY --from=backend /backend/target/release/just-host /app/backend
 COPY --from=frontend /frontend/dist /app/frontend

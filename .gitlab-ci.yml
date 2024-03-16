@@ -11,9 +11,9 @@ build-backend:
   stage: build
   image: rust:alpine
   script:
-    - apk add --update --no-cache musl-dev
+    - apk add --update --no-cache musl-dev libpq-dev
     - cd backend
-    - cargo build
+    - RUSTFLAGS="-C target-feature=-crt-static" cargo build
 
 build-frontend:
   stage: build
@@ -83,8 +83,7 @@ test-backend:
   variables:
     FF_NETWORK_PER_BUILD: "true"
   script:
-    - apk add --update --no-cache musl-dev cargo
-    - docker build -t app -f docker/prod/Dockerfile .
-    - docker run --detach -p 0.0.0.0:8601:8601 app
+    - apk add --update --no-cache cargo musl-dev libpq-dev
+    - JUST_HOST_HOME="/app/just-host-data" docker compose -f docker/prod/compose.yml up --detach
     - cd backend
-    - HOSTNAME=docker cargo test
+    - HOSTNAME=docker PORT=8801 cargo test

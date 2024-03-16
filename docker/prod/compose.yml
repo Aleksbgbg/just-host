@@ -1,0 +1,36 @@
+version: "3"
+services:
+  server:
+    image: just-host/server
+    build:
+      context: ../..
+      dockerfile: docker/prod/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ${JUST_HOST_HOME}:/app/home
+    ports:
+      - "8801:8801"
+    environment:
+      APP_PORT: 8801
+      DATABASE_HOST: postgres
+
+  postgres:
+    image: postgres:alpine
+    restart: unless-stopped
+    volumes:
+      - ${JUST_HOST_HOME}/data/postgresql:/var/lib/postgresql/data
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: just-host
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      start_period: 30s
+      start_interval: 1s
+      interval: 8766h
+      timeout: 5s
+      retries: 5
