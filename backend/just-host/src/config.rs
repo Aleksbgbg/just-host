@@ -1,13 +1,14 @@
-use serde::{Deserialize, Serialize};
+use figment::providers::{Env, Format, Toml};
+use figment::Figment;
+use serde::Deserialize;
 use thiserror::Error;
-use toml_env::Args;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Deserialize)]
 pub struct Config {
   pub app: App,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Deserialize)]
 pub struct App {
   pub host: [u8; 4],
   pub port: u16,
@@ -16,15 +17,14 @@ pub struct App {
 #[derive(Error, Debug)]
 pub enum ConfigError {
   #[error(transparent)]
-  Load(#[from] toml_env::Error),
-  #[error("config file '.env.toml' was not found or was in an invalid format")]
-  Invalid,
+  Load(#[from] figment::Error),
 }
 
 pub fn load() -> Result<Config, ConfigError> {
-  toml_env::initialize(Args {
-    config_variable_name: "config",
-    ..Default::default()
-  })?
-  .ok_or(ConfigError::Invalid)
+  Ok(
+    Figment::new()
+      .merge(Toml::file(".env.toml"))
+      .merge(Env::raw().split("_"))
+      .extract()?,
+  )
 }
