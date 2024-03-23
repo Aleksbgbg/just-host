@@ -1,5 +1,6 @@
 # Backend
 target/
+just_host_home_*/
 
 # Frontend
 node_modules/
