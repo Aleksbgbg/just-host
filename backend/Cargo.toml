@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["just-host", "tests"]
+members = ["fs", "fs-file", "just-host", "tests"]
 
 [profile.release]
 strip = true
