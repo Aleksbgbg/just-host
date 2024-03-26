@@ -58,6 +58,10 @@ pub enum HandlerError {
   NameExists,
   #[error("Email Address is already registered.")]
   EmailExists,
+  #[error("Invalid credentials.")]
+  NoUser,
+  #[error("Invalid credentials.")]
+  ValidateCredentials(argon2::password_hash::errors::Error),
 
   #[error("Database transaction failed.")]
   Database(#[from] DatabaseError),
@@ -69,6 +73,8 @@ pub enum HandlerError {
   ConvertIntegerToTimestamp(#[from] TryFromIntError),
   #[error("Could not encode JWT.")]
   EncodeJwt(#[from] jsonwebtoken::errors::Error),
+  #[error("Could not parse password hash.")]
+  ParseHash(argon2::password_hash::errors::Error),
 }
 
 impl HandlerError {
@@ -135,12 +141,15 @@ impl IntoResponse for HandlerError {
         errors.add_one_specific("emailAddress".into(), self.to_string());
         errors
       }),
+      HandlerError::NoUser => self.as_generic(StatusCode::BAD_REQUEST),
+      HandlerError::ValidateCredentials(_) => self.as_generic(StatusCode::BAD_REQUEST),
 
       HandlerError::Database(ref inner) => self.log_server_error(inner),
       HandlerError::HashPassword(ref inner) => self.log_server_error(inner),
       HandlerError::GenerateSecret(ref inner) => self.log_server_error(inner),
       HandlerError::ConvertIntegerToTimestamp(ref inner) => self.log_server_error(inner),
       HandlerError::EncodeJwt(ref inner) => self.log_server_error(inner),
+      HandlerError::ParseHash(ref inner) => self.log_server_error(inner),
     }
     .into_response()
   }

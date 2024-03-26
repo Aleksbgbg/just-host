@@ -4,7 +4,7 @@ use crate::secure::Bytes;
 use crate::{secure, AppState, API_PREFIX, SECRET_LEN};
 use argon2::password_hash::rand_core::OsRng;
 use argon2::password_hash::{PasswordHasher, SaltString};
-use argon2::Argon2;
+use argon2::{Argon2, PasswordHash, PasswordVerifier};
 use axum::extract::State;
 use axum::http::StatusCode;
 use axum_extra::extract::cookie::{Cookie, SameSite};
@@ -116,4 +116,32 @@ pub async fn register(
   let cookies = authenticate(&state, cookies, &user, *AUTH_DURATION)?;
 
   Ok((StatusCode::CREATED, cookies))
+}
+
+#[derive(Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
+pub struct LoginUser {
+  #[validate(length(min = 2, max = 32))]
+  username: String,
+  #[validate(length(min = 6, max = 128))]
+  password: String,
+}
+
+pub async fn login(
+  State(state): State<AppState>,
+  cookies: CookieJar,
+  ValidatedJson(input): ValidatedJson<LoginUser>,
+) -> Result<(StatusCode, CookieJar), HandlerError> {
+  let user = user::fetch_by_username(&state.connection_pool, &input.username)
+    .await?
+    .ok_or(HandlerError::NoUser)?;
+
+  let parsed_hash = PasswordHash::new(&user.password_hash).map_err(HandlerError::ParseHash)?;
+  Argon2::default()
+    .verify_password(input.password.as_bytes(), &parsed_hash)
+    .map_err(HandlerError::ValidateCredentials)?;
+
+  let cookies = authenticate(&state, cookies, &user, *AUTH_DURATION)?;
+
+  Ok((StatusCode::OK, cookies))
 }

@@ -4,8 +4,8 @@ use crate::snowflake::SnowflakeGenerator;
 use diesel::pg::Pg;
 use diesel::sql_types::VarChar;
 use diesel::{
-  sql_function, Insertable, OptionalExtension, QueryDsl, Queryable, Selectable, SelectableHelper,
-  TextExpressionMethods,
+  sql_function, ExpressionMethods, Insertable, OptionalExtension, QueryDsl, Queryable, Selectable,
+  SelectableHelper, TextExpressionMethods,
 };
 use diesel_async::pooled_connection::deadpool::{Pool, PoolError};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
@@ -70,6 +70,20 @@ pub async fn email_exists(
       .await
       .optional()?
       .is_some(),
+  )
+}
+
+pub async fn fetch_by_username(
+  pool: &Pool<AsyncPgConnection>,
+  username: &str,
+) -> Result<Option<User>, DatabaseError> {
+  Ok(
+    users::table
+      .select(User::as_select())
+      .filter(users::username.eq(username))
+      .first(&mut pool.get().await?)
+      .await
+      .optional()?,
   )
 }
 

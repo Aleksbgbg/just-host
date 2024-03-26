@@ -142,6 +142,7 @@ async fn start() -> Result<AppSuccess, AppError> {
 
   let api = Router::new()
     .route("/register", routing::post(user::register))
+    .route("/login", routing::post(user::login))
     .with_state(Arc::new(State {
       connection_pool,
       user_snowflake: SnowflakeGenerator::new(0),
