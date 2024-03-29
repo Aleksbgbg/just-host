@@ -87,6 +87,20 @@ pub async fn fetch_by_username(
   )
 }
 
+pub async fn fetch_by_id(
+  pool: &Pool<AsyncPgConnection>,
+  id: Id,
+) -> Result<Option<User>, DatabaseError> {
+  Ok(
+    users::table
+      .select(User::as_select())
+      .find(id)
+      .first(&mut pool.get().await?)
+      .await
+      .optional()?,
+  )
+}
+
 #[derive(Insertable)]
 #[diesel(table_name = users)]
 #[diesel(check_for_backend(Pg))]

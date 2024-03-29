@@ -1,3 +1,4 @@
+use super::user::AuthError;
 use crate::models::user::DatabaseError;
 use axum::extract::rejection::JsonRejection;
 use axum::extract::{FromRequest, Request};
@@ -62,6 +63,8 @@ pub enum HandlerError {
   NoUser,
   #[error("Invalid credentials.")]
   ValidateCredentials(argon2::password_hash::errors::Error),
+  #[error("Authentication token could not be verified: {0}.")]
+  Authenticate(#[from] AuthError),
 
   #[error("Database transaction failed.")]
   Database(#[from] DatabaseError),
@@ -143,6 +146,7 @@ impl IntoResponse for HandlerError {
       }),
       HandlerError::NoUser => self.as_generic(StatusCode::BAD_REQUEST),
       HandlerError::ValidateCredentials(_) => self.as_generic(StatusCode::BAD_REQUEST),
+      HandlerError::Authenticate(_) => self.as_generic(StatusCode::BAD_REQUEST),
 
       HandlerError::Database(ref inner) => self.log_server_error(inner),
       HandlerError::HashPassword(ref inner) => self.log_server_error(inner),

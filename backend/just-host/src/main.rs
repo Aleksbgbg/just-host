@@ -5,7 +5,7 @@ mod secure;
 mod snowflake;
 
 use crate::secure::Bytes;
-use axum::{routing, Router};
+use axum::{middleware, routing, Router};
 use config::ConfigError;
 use controllers::user;
 use diesel::{Connection, ConnectionError, PgConnection};
@@ -140,14 +140,23 @@ async fn start() -> Result<AppSuccess, AppError> {
   }
   .await?;
 
+  let state = Arc::new(State {
+    connection_pool,
+    user_snowflake: SnowflakeGenerator::new(0),
+    auth_secret,
+  });
+
   let api = Router::new()
     .route("/register", routing::post(user::register))
     .route("/login", routing::post(user::login))
-    .with_state(Arc::new(State {
-      connection_pool,
-      user_snowflake: SnowflakeGenerator::new(0),
-      auth_secret,
-    }));
+    .route(
+      "/user",
+      routing::get(user::get).layer(middleware::from_fn_with_state(
+        Arc::clone(&state),
+        user::extract,
+      )),
+    )
+    .with_state(state);
   let app = Router::new()
     .nest_service(ROOT_PREFIX, ServeDir::new("frontend"))
     .nest(API_PREFIX, api)

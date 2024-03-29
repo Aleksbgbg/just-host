@@ -1,18 +1,25 @@
 use crate::controllers::errors::{HandlerError, ValidatedJson};
+use crate::models::id::Id;
 use crate::models::user::{self, Authority, CreateUser, User};
 use crate::secure::Bytes;
 use crate::{secure, AppState, API_PREFIX, SECRET_LEN};
 use argon2::password_hash::rand_core::OsRng;
 use argon2::password_hash::{PasswordHasher, SaltString};
 use argon2::{Argon2, PasswordHash, PasswordVerifier};
-use axum::extract::State;
+use axum::extract::{Request, State};
 use axum::http::StatusCode;
+use axum::middleware::Next;
+use axum::response::Response;
+use axum::{Extension, Json};
 use axum_extra::extract::cookie::{Cookie, SameSite};
 use axum_extra::extract::CookieJar;
 use chrono::{Duration, Utc};
-use jsonwebtoken::{EncodingKey, Header};
+use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation};
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
+use std::str::FromStr;
+use std::sync::Arc;
+use thiserror::Error;
 use validator::Validate;
 
 const AUTH_COOKIE_KEY: &str = "Authorization";
@@ -62,7 +69,7 @@ fn authenticate(
   let cookie = Cookie::build((AUTH_COOKIE_KEY, token))
     .max_age(time::Duration::seconds(lifespan.num_seconds()))
     .path(API_PREFIX)
-    .secure(true)
+    .secure(cfg!(not(debug_assertions)))
     .http_only(true)
     .same_site(SameSite::Strict)
     .build();
@@ -144,4 +151,69 @@ pub async fn login(
   let cookies = authenticate(&state, cookies, &user, *AUTH_DURATION)?;
 
   Ok((StatusCode::OK, cookies))
+}
+
+#[derive(Error, Debug)]
+pub enum AuthError {
+  #[error("no authorization cookie set")]
+  NoAuthCookie,
+  #[error("could not decode header")]
+  DecodeHeader(jsonwebtoken::errors::Error),
+  #[error("user ID was not present")]
+  NoKid,
+  #[error("could not decode user ID")]
+  DecodeId(bs58::decode::Error),
+  #[error("user ID was not found")]
+  UserNotFound,
+  #[error("could not decode authentication token")]
+  DecodeJwt(jsonwebtoken::errors::Error),
+}
+
+pub async fn extract(
+  State(state): State<AppState>,
+  cookies: CookieJar,
+  mut req: Request,
+  next: Next,
+) -> Result<Response, HandlerError> {
+  let token = cookies
+    .get(AUTH_COOKIE_KEY)
+    .ok_or(AuthError::NoAuthCookie)?
+    .value();
+
+  let id = jsonwebtoken::decode_header(token)
+    .map_err(AuthError::DecodeHeader)?
+    .kid
+    .ok_or(AuthError::NoKid)?;
+
+  let user = user::fetch_by_id(
+    &state.connection_pool,
+    Id::from_str(&id).map_err(AuthError::DecodeId)?,
+  )
+  .await?
+  .ok_or(AuthError::UserNotFound)?;
+
+  let _claims = jsonwebtoken::decode::<Claims>(
+    token,
+    &DecodingKey::from_secret(&interleave(&state.auth_secret, &user.auth_secret)),
+    &Validation::default(),
+  )
+  .map_err(AuthError::DecodeJwt)?
+  .claims;
+
+  req.extensions_mut().insert(Arc::new(user));
+
+  Ok(next.run(req).await)
+}
+
+#[derive(Serialize)]
+pub struct UserDetails {
+  id: Id,
+  username: String,
+}
+
+pub async fn get(Extension(user): Extension<Arc<User>>) -> Json<UserDetails> {
+  Json(UserDetails {
+    id: user.id,
+    username: user.username.clone(),
+  })
 }
