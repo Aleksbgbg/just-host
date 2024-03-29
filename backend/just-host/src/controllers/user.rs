@@ -139,7 +139,7 @@ pub async fn login(
   cookies: CookieJar,
   ValidatedJson(input): ValidatedJson<LoginUser>,
 ) -> Result<(StatusCode, CookieJar), HandlerError> {
-  let user = user::fetch_by_username(&state.connection_pool, &input.username)
+  let user = user::find_by_username(&state.connection_pool, &input.username)
     .await?
     .ok_or(HandlerError::NoUser)?;
 
@@ -189,7 +189,7 @@ pub async fn extract(
     .kid
     .ok_or(AuthError::NoKid)?;
 
-  let user = user::fetch_by_id(
+  let user = user::find_by_id(
     &state.connection_pool,
     Id::from_str(&id).map_err(AuthError::DecodeId)?,
   )

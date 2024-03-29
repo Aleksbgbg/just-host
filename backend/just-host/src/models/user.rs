@@ -73,7 +73,7 @@ pub async fn email_exists(
   )
 }
 
-pub async fn fetch_by_username(
+pub async fn find_by_username(
   pool: &Pool<AsyncPgConnection>,
   username: &str,
 ) -> Result<Option<User>, DatabaseError> {
@@ -87,7 +87,7 @@ pub async fn fetch_by_username(
   )
 }
 
-pub async fn fetch_by_id(
+pub async fn find_by_id(
   pool: &Pool<AsyncPgConnection>,
   id: Id,
 ) -> Result<Option<User>, DatabaseError> {
