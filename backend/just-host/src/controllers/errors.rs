@@ -63,8 +63,12 @@ pub enum HandlerError {
   NoUser,
   #[error("Invalid credentials.")]
   ValidateCredentials(argon2::password_hash::errors::Error),
-  #[error("Authentication token could not be verified: {0}.")]
-  Authenticate(#[from] AuthError),
+
+  #[error("A user is required but the authentication token could not be verified: {0}.")]
+  UserRequired(#[from] AuthError),
+
+  #[error("A user is already logged in.")]
+  UserAlreadyPresent,
 
   #[error("Database transaction failed.")]
   Database(#[from] DatabaseError),
@@ -146,7 +150,10 @@ impl IntoResponse for HandlerError {
       }),
       HandlerError::NoUser => self.as_generic(StatusCode::BAD_REQUEST),
       HandlerError::ValidateCredentials(_) => self.as_generic(StatusCode::BAD_REQUEST),
-      HandlerError::Authenticate(_) => self.as_generic(StatusCode::BAD_REQUEST),
+
+      HandlerError::UserRequired(_) => self.as_generic(StatusCode::UNAUTHORIZED),
+
+      HandlerError::UserAlreadyPresent => self.as_generic(StatusCode::FORBIDDEN),
 
       HandlerError::Database(ref inner) => self.log_server_error(inner),
       HandlerError::HashPassword(ref inner) => self.log_server_error(inner),

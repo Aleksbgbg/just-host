@@ -77,6 +77,46 @@ fn authenticate(
   Ok(cookies.add(cookie))
 }
 
+async fn try_extract(state: &crate::State, cookies: CookieJar) -> Result<User, HandlerError> {
+  let token = cookies
+    .get(AUTH_COOKIE_KEY)
+    .ok_or(AuthError::NoAuthCookie)?
+    .value();
+
+  let id = jsonwebtoken::decode_header(token)
+    .map_err(AuthError::DecodeHeader)?
+    .kid
+    .ok_or(AuthError::NoKid)?;
+
+  let user = user::find_by_id(
+    &state.connection_pool,
+    Id::from_str(&id).map_err(AuthError::DecodeId)?,
+  )
+  .await?
+  .ok_or(AuthError::UserNotFound)?;
+
+  let _claims = jsonwebtoken::decode::<Claims>(
+    token,
+    &DecodingKey::from_secret(&interleave(&state.auth_secret, &user.auth_secret)),
+    &Validation::default(),
+  )
+  .map_err(AuthError::DecodeJwt)?
+  .claims;
+
+  Ok(user)
+}
+
+pub async fn extract(
+  State(state): State<AppState>,
+  cookies: CookieJar,
+  mut req: Request,
+  next: Next,
+) -> Result<Response, HandlerError> {
+  let user = try_extract(&state, cookies).await?;
+  req.extensions_mut().insert(Arc::new(user));
+  Ok(next.run(req).await)
+}
+
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct RegisterUser {
@@ -95,6 +135,10 @@ pub async fn register(
   cookies: CookieJar,
   ValidatedJson(input): ValidatedJson<RegisterUser>,
 ) -> Result<(StatusCode, CookieJar), HandlerError> {
+  if try_extract(&state, cookies.clone()).await.is_ok() {
+    return Err(HandlerError::UserAlreadyPresent);
+  }
+
   if user::name_exists(&state.connection_pool, &input.username).await? {
     return Err(HandlerError::NameExists);
   }
@@ -171,42 +215,6 @@ pub enum AuthError {
   UserNotFound,
   #[error("could not decode authentication token")]
   DecodeJwt(jsonwebtoken::errors::Error),
-}
-
-pub async fn extract(
-  State(state): State<AppState>,
-  cookies: CookieJar,
-  mut req: Request,
-  next: Next,
-) -> Result<Response, HandlerError> {
-  let token = cookies
-    .get(AUTH_COOKIE_KEY)
-    .ok_or(AuthError::NoAuthCookie)?
-    .value();
-
-  let id = jsonwebtoken::decode_header(token)
-    .map_err(AuthError::DecodeHeader)?
-    .kid
-    .ok_or(AuthError::NoKid)?;
-
-  let user = user::find_by_id(
-    &state.connection_pool,
-    Id::from_str(&id).map_err(AuthError::DecodeId)?,
-  )
-  .await?
-  .ok_or(AuthError::UserNotFound)?;
-
-  let _claims = jsonwebtoken::decode::<Claims>(
-    token,
-    &DecodingKey::from_secret(&interleave(&state.auth_secret, &user.auth_secret)),
-    &Validation::default(),
-  )
-  .map_err(AuthError::DecodeJwt)?
-  .claims;
-
-  req.extensions_mut().insert(Arc::new(user));
-
-  Ok(next.run(req).await)
 }
 
 #[derive(Serialize)]

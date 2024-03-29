@@ -149,13 +149,14 @@ async fn start() -> Result<AppSuccess, AppError> {
   let api = Router::new()
     .route("/register", routing::post(user::register))
     .route("/login", routing::post(user::login))
-    .route("/logout", routing::post(user::logout))
-    .route(
-      "/user",
-      routing::get(user::get).layer(middleware::from_fn_with_state(
-        Arc::clone(&state),
-        user::extract,
-      )),
+    .merge(
+      Router::new()
+        .route("/logout", routing::post(user::logout))
+        .route("/user", routing::get(user::get))
+        .layer(middleware::from_fn_with_state(
+          Arc::clone(&state),
+          user::extract,
+        )),
     )
     .with_state(state);
   let app = Router::new()
