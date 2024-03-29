@@ -44,7 +44,7 @@ impl Errors {
 
 impl IntoResponse for Errors {
   fn into_response(self) -> Response {
-    json!({"errors": &self}).to_string().into_response()
+    Json(json!({"errors": &self})).into_response()
   }
 }
 
