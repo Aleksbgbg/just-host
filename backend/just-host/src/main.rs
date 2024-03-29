@@ -149,6 +149,7 @@ async fn start() -> Result<AppSuccess, AppError> {
   let api = Router::new()
     .route("/register", routing::post(user::register))
     .route("/login", routing::post(user::login))
+    .route("/logout", routing::post(user::logout))
     .route(
       "/user",
       routing::get(user::get).layer(middleware::from_fn_with_state(

@@ -153,6 +153,10 @@ pub async fn login(
   Ok((StatusCode::OK, cookies))
 }
 
+pub async fn logout(cookies: CookieJar) -> CookieJar {
+  cookies.remove(AUTH_COOKIE_KEY)
+}
+
 #[derive(Error, Debug)]
 pub enum AuthError {
   #[error("no authorization cookie set")]
