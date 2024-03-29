@@ -49,8 +49,8 @@ pub async fn name_exists(
 ) -> Result<bool, DatabaseError> {
   Ok(
     users::table
-      .select(users::id)
       .filter(lower(users::username).like(username.to_lowercase()))
+      .select(users::id)
       .first::<i64>(&mut pool.get().await?)
       .await
       .optional()?
@@ -64,8 +64,8 @@ pub async fn email_exists(
 ) -> Result<bool, DatabaseError> {
   Ok(
     users::table
-      .select(users::id)
       .filter(lower(users::email).like(email.to_lowercase()))
+      .select(users::id)
       .first::<i64>(&mut pool.get().await?)
       .await
       .optional()?
@@ -79,8 +79,8 @@ pub async fn find_by_username(
 ) -> Result<Option<User>, DatabaseError> {
   Ok(
     users::table
-      .select(User::as_select())
       .filter(users::username.eq(username))
+      .select(User::as_select())
       .first(&mut pool.get().await?)
       .await
       .optional()?,
@@ -93,8 +93,8 @@ pub async fn find_by_id(
 ) -> Result<Option<User>, DatabaseError> {
   Ok(
     users::table
-      .select(User::as_select())
       .find(id)
+      .select(User::as_select())
       .first(&mut pool.get().await?)
       .await
       .optional()?,
