@@ -77,7 +77,7 @@ fn authenticate(
   Ok(cookies.add(cookie))
 }
 
-async fn try_extract(state: &crate::State, cookies: CookieJar) -> Result<User, HandlerError> {
+async fn try_extract(state: &AppState, cookies: CookieJar) -> Result<User, HandlerError> {
   let token = cookies
     .get(AUTH_COOKIE_KEY)
     .ok_or(AuthError::NoAuthCookie)?
@@ -107,7 +107,7 @@ async fn try_extract(state: &crate::State, cookies: CookieJar) -> Result<User, H
 }
 
 pub async fn extract(
-  State(state): State<AppState>,
+  State(state): State<Arc<AppState>>,
   cookies: CookieJar,
   mut req: Request,
   next: Next,
@@ -131,7 +131,7 @@ pub struct RegisterUser {
 }
 
 pub async fn register(
-  State(state): State<AppState>,
+  State(state): State<Arc<AppState>>,
   cookies: CookieJar,
   ValidatedJson(input): ValidatedJson<RegisterUser>,
 ) -> Result<(StatusCode, CookieJar), HandlerError> {
@@ -179,7 +179,7 @@ pub struct LoginUser {
 }
 
 pub async fn login(
-  State(state): State<AppState>,
+  State(state): State<Arc<AppState>>,
   cookies: CookieJar,
   ValidatedJson(input): ValidatedJson<LoginUser>,
 ) -> Result<(StatusCode, CookieJar), HandlerError> {

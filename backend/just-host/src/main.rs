@@ -75,13 +75,11 @@ filesystem!(
 "
 );
 
-struct State {
+struct AppState {
   connection_pool: Pool<AsyncPgConnection>,
   user_snowflake: SnowflakeGenerator,
   auth_secret: Vec<u8>,
 }
-
-type AppState = Arc<State>;
 
 #[tokio::main]
 async fn start() -> Result<AppSuccess, AppError> {
@@ -140,7 +138,7 @@ async fn start() -> Result<AppSuccess, AppError> {
   }
   .await?;
 
-  let state = Arc::new(State {
+  let state = Arc::new(AppState {
     connection_pool,
     user_snowflake: SnowflakeGenerator::new(0),
     auth_secret,
