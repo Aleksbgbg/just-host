@@ -28,7 +28,6 @@ use tracing::{error, info, Level};
 
 const SECRET_LEN: usize = 32;
 
-const ROOT_PREFIX: &str = "/";
 const API_PREFIX: &str = "/api";
 
 #[derive(Error, Debug)]
@@ -158,7 +157,7 @@ async fn start() -> Result<AppSuccess, AppError> {
     )
     .with_state(state);
   let app = Router::new()
-    .nest_service(ROOT_PREFIX, ServeDir::new("frontend"))
+    .fallback_service(ServeDir::new("frontend"))
     .nest(API_PREFIX, api)
     .layer(
       TraceLayer::new_for_http()

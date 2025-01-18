@@ -168,7 +168,6 @@ impl IntoResponse for HandlerError {
 
 pub struct ValidatedJson<T>(pub T);
 
-#[axum::async_trait]
 impl<T, S> FromRequest<S> for ValidatedJson<T>
 where
   T: DeserializeOwned + Validate,

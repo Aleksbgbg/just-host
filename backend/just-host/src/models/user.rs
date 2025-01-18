@@ -4,15 +4,15 @@ use crate::snowflake::SnowflakeGenerator;
 use diesel::pg::Pg;
 use diesel::sql_types::VarChar;
 use diesel::{
-  sql_function, ExpressionMethods, Insertable, OptionalExtension, QueryDsl, Queryable, Selectable,
-  SelectableHelper, TextExpressionMethods,
+  define_sql_function, ExpressionMethods, Insertable, OptionalExtension, QueryDsl, Queryable,
+  Selectable, SelectableHelper, TextExpressionMethods,
 };
 use diesel_async::pooled_connection::deadpool::{Pool, PoolError};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
 use diesel_derive_enum::DbEnum;
 use thiserror::Error;
 
-sql_function!(fn lower(x: VarChar) -> VarChar);
+define_sql_function!(fn lower(x: VarChar) -> VarChar);
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug, DbEnum)]
 #[ExistingTypePath = "crate::models::schema::sql_types::Authority"]
