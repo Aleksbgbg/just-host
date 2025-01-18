@@ -1,13 +1,13 @@
 use super::user::AuthError;
 use crate::models::user::DatabaseError;
+use axum::Json;
 use axum::extract::rejection::JsonRejection;
 use axum::extract::{FromRequest, Request};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
-use axum::Json;
 use convert_case::{Case, Casing};
-use serde::de::DeserializeOwned;
 use serde::Serialize;
+use serde::de::DeserializeOwned;
 use serde_json::json;
 use std::collections::HashMap;
 use std::fmt::Display;

@@ -142,17 +142,14 @@ mod tests {
   fn parse_single_file() {
     let result = parse_fs("filename #file");
 
-    assert_eq!(
-      result,
-      ParsedFs {
-        paths: vec![FsPath {
-          name: "file".into(),
-          path_format: "filename".into(),
-          vars: Default::default(),
-        }],
-        unique_vars: Default::default(),
-      }
-    );
+    assert_eq!(result, ParsedFs {
+      paths: vec![FsPath {
+        name: "file".into(),
+        path_format: "filename".into(),
+        vars: Default::default(),
+      }],
+      unique_vars: Default::default(),
+    });
   }
 
   #[test]
@@ -164,17 +161,14 @@ parent
 ",
     );
 
-    assert_eq!(
-      result,
-      ParsedFs {
-        paths: vec![FsPath {
-          name: "file".into(),
-          path_format: "parent/filename".into(),
-          vars: Default::default(),
-        }],
-        unique_vars: Default::default(),
-      }
-    );
+    assert_eq!(result, ParsedFs {
+      paths: vec![FsPath {
+        name: "file".into(),
+        path_format: "parent/filename".into(),
+        vars: Default::default(),
+      }],
+      unique_vars: Default::default(),
+    });
   }
 
   #[test]
@@ -187,17 +181,14 @@ parent
 ",
     );
 
-    assert_eq!(
-      result,
-      ParsedFs {
-        paths: vec![FsPath {
-          name: "file".into(),
-          path_format: "parent/child/filename".into(),
-          vars: Default::default(),
-        }],
-        unique_vars: Default::default(),
-      }
-    );
+    assert_eq!(result, ParsedFs {
+      paths: vec![FsPath {
+        name: "file".into(),
+        path_format: "parent/child/filename".into(),
+        vars: Default::default(),
+      }],
+      unique_vars: Default::default(),
+    });
   }
 
   #[test]
@@ -213,24 +204,21 @@ parent_2
 ",
     );
 
-    assert_eq!(
-      result,
-      ParsedFs {
-        paths: vec![
-          FsPath {
-            name: "file".into(),
-            path_format: "parent/child/filename".into(),
-            vars: Default::default(),
-          },
-          FsPath {
-            name: "file_2".into(),
-            path_format: "parent_2/child/filename".into(),
-            vars: Default::default(),
-          },
-        ],
-        unique_vars: Default::default(),
-      }
-    );
+    assert_eq!(result, ParsedFs {
+      paths: vec![
+        FsPath {
+          name: "file".into(),
+          path_format: "parent/child/filename".into(),
+          vars: Default::default(),
+        },
+        FsPath {
+          name: "file_2".into(),
+          path_format: "parent_2/child/filename".into(),
+          vars: Default::default(),
+        },
+      ],
+      unique_vars: Default::default(),
+    });
   }
 
   // A complex tree must include:
@@ -267,81 +255,75 @@ parent_2
 ",
     );
 
-    assert_eq!(
-      result,
-      ParsedFs {
-        paths: vec![
-          FsPath {
-            name: "file_1".into(),
-            path_format: "filename_1".into(),
-            vars: Default::default(),
-          },
-          FsPath {
-            name: "file_2".into(),
-            path_format: "filename_2".into(),
-            vars: Default::default(),
-          },
-          FsPath {
-            name: "file_3".into(),
-            path_format: "parent_1/filename_3".into(),
-            vars: Default::default(),
-          },
-          FsPath {
-            name: "file_4".into(),
-            path_format: "parent_1/filename_4".into(),
-            vars: Default::default(),
-          },
-          FsPath {
-            name: "file_5".into(),
-            path_format: "parent_1/child_1/very/deeply/nested/filename_5".into(),
-            vars: Default::default(),
-          },
-          FsPath {
-            name: "file_6".into(),
-            path_format: "parent_1/child_2/filename_6".into(),
-            vars: Default::default(),
-          },
-          FsPath {
-            name: "file_7".into(),
-            path_format: "parent_2/child_1/very/deeply/nested/filename_7".into(),
-            vars: Default::default(),
-          },
-          FsPath {
-            name: "file_8".into(),
-            path_format: "parent_2/child_1/very/deeply/nested/filename_8".into(),
-            vars: Default::default(),
-          },
-          FsPath {
-            name: "file_9".into(),
-            path_format: "parent_2/child_1/very/deeply/nested/child_1/filename_9".into(),
-            vars: Default::default(),
-          },
-          FsPath {
-            name: "file_10".into(),
-            path_format: "parent_2/child_1/very/deeply/nested/child_2/filename_10".into(),
-            vars: Default::default(),
-          },
-        ],
-        unique_vars: Default::default(),
-      }
-    );
+    assert_eq!(result, ParsedFs {
+      paths: vec![
+        FsPath {
+          name: "file_1".into(),
+          path_format: "filename_1".into(),
+          vars: Default::default(),
+        },
+        FsPath {
+          name: "file_2".into(),
+          path_format: "filename_2".into(),
+          vars: Default::default(),
+        },
+        FsPath {
+          name: "file_3".into(),
+          path_format: "parent_1/filename_3".into(),
+          vars: Default::default(),
+        },
+        FsPath {
+          name: "file_4".into(),
+          path_format: "parent_1/filename_4".into(),
+          vars: Default::default(),
+        },
+        FsPath {
+          name: "file_5".into(),
+          path_format: "parent_1/child_1/very/deeply/nested/filename_5".into(),
+          vars: Default::default(),
+        },
+        FsPath {
+          name: "file_6".into(),
+          path_format: "parent_1/child_2/filename_6".into(),
+          vars: Default::default(),
+        },
+        FsPath {
+          name: "file_7".into(),
+          path_format: "parent_2/child_1/very/deeply/nested/filename_7".into(),
+          vars: Default::default(),
+        },
+        FsPath {
+          name: "file_8".into(),
+          path_format: "parent_2/child_1/very/deeply/nested/filename_8".into(),
+          vars: Default::default(),
+        },
+        FsPath {
+          name: "file_9".into(),
+          path_format: "parent_2/child_1/very/deeply/nested/child_1/filename_9".into(),
+          vars: Default::default(),
+        },
+        FsPath {
+          name: "file_10".into(),
+          path_format: "parent_2/child_1/very/deeply/nested/child_2/filename_10".into(),
+          vars: Default::default(),
+        },
+      ],
+      unique_vars: Default::default(),
+    });
   }
 
   #[test]
   fn var_parse_single_file() {
     let result = parse_fs("<Filename> #file");
 
-    assert_eq!(
-      result,
-      ParsedFs {
-        paths: vec![FsPath {
-          name: "file".into(),
-          path_format: "{}".into(),
-          vars: vec!["Filename".into()],
-        }],
-        unique_vars: HashSet::from(["Filename".into()]),
-      }
-    );
+    assert_eq!(result, ParsedFs {
+      paths: vec![FsPath {
+        name: "file".into(),
+        path_format: "{}".into(),
+        vars: vec!["Filename".into()],
+      }],
+      unique_vars: HashSet::from(["Filename".into()]),
+    });
   }
 
   #[test]
@@ -353,17 +335,14 @@ parent_2
 ",
     );
 
-    assert_eq!(
-      result,
-      ParsedFs {
-        paths: vec![FsPath {
-          name: "file".into(),
-          path_format: "{}/{}".into(),
-          vars: vec!["Parent".into(), "Filename".into()],
-        }],
-        unique_vars: HashSet::from(["Parent".into(), "Filename".into()]),
-      }
-    );
+    assert_eq!(result, ParsedFs {
+      paths: vec![FsPath {
+        name: "file".into(),
+        path_format: "{}/{}".into(),
+        vars: vec!["Parent".into(), "Filename".into()],
+      }],
+      unique_vars: HashSet::from(["Parent".into(), "Filename".into()]),
+    });
   }
 
   #[test]
@@ -376,17 +355,14 @@ parent_2
 ",
     );
 
-    assert_eq!(
-      result,
-      ParsedFs {
-        paths: vec![FsPath {
-          name: "file".into(),
-          path_format: "{}/{}/{}".into(),
-          vars: vec!["Parent".into(), "Child".into(), "Filename".into()],
-        }],
-        unique_vars: HashSet::from(["Parent".into(), "Child".into(), "Filename".into()]),
-      }
-    );
+    assert_eq!(result, ParsedFs {
+      paths: vec![FsPath {
+        name: "file".into(),
+        path_format: "{}/{}/{}".into(),
+        vars: vec!["Parent".into(), "Child".into(), "Filename".into()],
+      }],
+      unique_vars: HashSet::from(["Parent".into(), "Child".into(), "Filename".into()]),
+    });
   }
 
   #[test]
@@ -402,30 +378,27 @@ parent_2
 ",
     );
 
-    assert_eq!(
-      result,
-      ParsedFs {
-        paths: vec![
-          FsPath {
-            name: "file".into(),
-            path_format: "{}/{}/{}".into(),
-            vars: vec!["Parent".into(), "Child".into(), "Filename".into()],
-          },
-          FsPath {
-            name: "file_2".into(),
-            path_format: "{}/{}/{}".into(),
-            vars: vec!["Parent2".into(), "Child".into(), "Filename2".into()],
-          },
-        ],
-        unique_vars: HashSet::from([
-          "Parent".into(),
-          "Child".into(),
-          "Filename".into(),
-          "Parent2".into(),
-          "Filename2".into(),
-        ]),
-      }
-    );
+    assert_eq!(result, ParsedFs {
+      paths: vec![
+        FsPath {
+          name: "file".into(),
+          path_format: "{}/{}/{}".into(),
+          vars: vec!["Parent".into(), "Child".into(), "Filename".into()],
+        },
+        FsPath {
+          name: "file_2".into(),
+          path_format: "{}/{}/{}".into(),
+          vars: vec!["Parent2".into(), "Child".into(), "Filename2".into()],
+        },
+      ],
+      unique_vars: HashSet::from([
+        "Parent".into(),
+        "Child".into(),
+        "Filename".into(),
+        "Parent2".into(),
+        "Filename2".into(),
+      ]),
+    });
   }
 
   // A complex tree with variables must:
@@ -471,114 +444,111 @@ parent_1
 ",
     );
 
-    assert_eq!(
-      result,
-      ParsedFs {
-        paths: vec![
-          FsPath {
-            name: "file_1".into(),
-            path_format: "{}_file".into(),
-            vars: vec!["Filename1".into()],
-          },
-          FsPath {
-            name: "file_2".into(),
-            path_format: "file_{}_file".into(),
-            vars: vec!["Filename2".into()],
-          },
-          FsPath {
-            name: "file_3".into(),
-            path_format: "parent_1/filename_3".into(),
-            vars: Default::default(),
-          },
-          FsPath {
-            name: "file_4".into(),
-            path_format: "parent_1/{}_{}_{}.{}".into(),
-            vars: vec![
-              "VarName1".into(),
-              "VarName2".into(),
-              "VarName3".into(),
-              "Extension1".into(),
-            ],
-          },
-          FsPath {
-            name: "file_5".into(),
-            path_format: "parent_1/child_{}/very/{}/nested/{}.txt".into(),
-            vars: vec![
-              "DirectoryName1".into(),
-              "DirectoryName2".into(),
-              "Filename3".into(),
-            ],
-          },
-          FsPath {
-            name: "file_6".into(),
-            path_format: "parent_1/child_{}/filename_6".into(),
-            vars: vec!["DirectoryName3".into()],
-          },
-          FsPath {
-            name: "file_7".into(),
-            path_format: "{}/child_1/{}_{}_{}/deeply/{}/filename_7".into(),
-            vars: vec![
-              "DirectoryName4".into(),
-              "VarName4".into(),
-              "VarName5".into(),
-              "VarName6".into(),
-              "Nested".into(),
-            ],
-          },
-          FsPath {
-            name: "file_8".into(),
-            path_format: "{}/child_1/{}_{}_{}/deeply/{}/filename_8".into(),
-            vars: vec![
-              "DirectoryName4".into(),
-              "VarName4".into(),
-              "VarName5".into(),
-              "VarName6".into(),
-              "Nested".into(),
-            ],
-          },
-          FsPath {
-            name: "file_9".into(),
-            path_format: "{}/child_1/{}_{}_{}/deeply/{}/child_1/filename.{}".into(),
-            vars: vec![
-              "DirectoryName4".into(),
-              "VarName4".into(),
-              "VarName5".into(),
-              "VarName6".into(),
-              "Nested".into(),
-              "Extension2".into(),
-            ],
-          },
-          FsPath {
-            name: "file_10".into(),
-            path_format: "{}/child_1/{}_{}_{}/deeply/{}/child_2/filename_10".into(),
-            vars: vec![
-              "DirectoryName4".into(),
-              "VarName4".into(),
-              "VarName5".into(),
-              "VarName6".into(),
-              "Nested".into(),
-            ],
-          },
-        ],
-        unique_vars: HashSet::from([
-          "Filename1".into(),
-          "Filename2".into(),
-          "Filename3".into(),
-          "DirectoryName1".into(),
-          "DirectoryName2".into(),
-          "DirectoryName3".into(),
-          "DirectoryName4".into(),
-          "VarName1".into(),
-          "VarName2".into(),
-          "VarName3".into(),
-          "VarName4".into(),
-          "VarName5".into(),
-          "VarName6".into(),
-          "Extension1".into(),
-          "Extension2".into(),
-          "Nested".into(),
-        ]),
-      }
-    );
+    assert_eq!(result, ParsedFs {
+      paths: vec![
+        FsPath {
+          name: "file_1".into(),
+          path_format: "{}_file".into(),
+          vars: vec!["Filename1".into()],
+        },
+        FsPath {
+          name: "file_2".into(),
+          path_format: "file_{}_file".into(),
+          vars: vec!["Filename2".into()],
+        },
+        FsPath {
+          name: "file_3".into(),
+          path_format: "parent_1/filename_3".into(),
+          vars: Default::default(),
+        },
+        FsPath {
+          name: "file_4".into(),
+          path_format: "parent_1/{}_{}_{}.{}".into(),
+          vars: vec![
+            "VarName1".into(),
+            "VarName2".into(),
+            "VarName3".into(),
+            "Extension1".into(),
+          ],
+        },
+        FsPath {
+          name: "file_5".into(),
+          path_format: "parent_1/child_{}/very/{}/nested/{}.txt".into(),
+          vars: vec![
+            "DirectoryName1".into(),
+            "DirectoryName2".into(),
+            "Filename3".into(),
+          ],
+        },
+        FsPath {
+          name: "file_6".into(),
+          path_format: "parent_1/child_{}/filename_6".into(),
+          vars: vec!["DirectoryName3".into()],
+        },
+        FsPath {
+          name: "file_7".into(),
+          path_format: "{}/child_1/{}_{}_{}/deeply/{}/filename_7".into(),
+          vars: vec![
+            "DirectoryName4".into(),
+            "VarName4".into(),
+            "VarName5".into(),
+            "VarName6".into(),
+            "Nested".into(),
+          ],
+        },
+        FsPath {
+          name: "file_8".into(),
+          path_format: "{}/child_1/{}_{}_{}/deeply/{}/filename_8".into(),
+          vars: vec![
+            "DirectoryName4".into(),
+            "VarName4".into(),
+            "VarName5".into(),
+            "VarName6".into(),
+            "Nested".into(),
+          ],
+        },
+        FsPath {
+          name: "file_9".into(),
+          path_format: "{}/child_1/{}_{}_{}/deeply/{}/child_1/filename.{}".into(),
+          vars: vec![
+            "DirectoryName4".into(),
+            "VarName4".into(),
+            "VarName5".into(),
+            "VarName6".into(),
+            "Nested".into(),
+            "Extension2".into(),
+          ],
+        },
+        FsPath {
+          name: "file_10".into(),
+          path_format: "{}/child_1/{}_{}_{}/deeply/{}/child_2/filename_10".into(),
+          vars: vec![
+            "DirectoryName4".into(),
+            "VarName4".into(),
+            "VarName5".into(),
+            "VarName6".into(),
+            "Nested".into(),
+          ],
+        },
+      ],
+      unique_vars: HashSet::from([
+        "Filename1".into(),
+        "Filename2".into(),
+        "Filename3".into(),
+        "DirectoryName1".into(),
+        "DirectoryName2".into(),
+        "DirectoryName3".into(),
+        "DirectoryName4".into(),
+        "VarName1".into(),
+        "VarName2".into(),
+        "VarName3".into(),
+        "VarName4".into(),
+        "VarName5".into(),
+        "VarName6".into(),
+        "Extension1".into(),
+        "Extension2".into(),
+        "Nested".into(),
+      ]),
+    });
   }
 }

@@ -2,7 +2,7 @@ use crate::controllers::errors::{HandlerError, ValidatedJson};
 use crate::models::id::Id;
 use crate::models::user::{self, Authority, CreateUser, User};
 use crate::secure::Bytes;
-use crate::{secure, AppState, API_PREFIX, SECRET_LEN};
+use crate::{API_PREFIX, AppState, SECRET_LEN, secure};
 use argon2::password_hash::rand_core::OsRng;
 use argon2::password_hash::{PasswordHasher, SaltString};
 use argon2::{Argon2, PasswordHash, PasswordVerifier};
@@ -11,8 +11,8 @@ use axum::http::StatusCode;
 use axum::middleware::Next;
 use axum::response::Response;
 use axum::{Extension, Json};
-use axum_extra::extract::cookie::{Cookie, SameSite};
 use axum_extra::extract::CookieJar;
+use axum_extra::extract::cookie::{Cookie, SameSite};
 use chrono::{Duration, Utc};
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation};
 use lazy_static::lazy_static;
@@ -151,17 +151,13 @@ pub async fn register(
     .map_err(HandlerError::HashPassword)?
     .to_string();
   let auth_secret = secure::random_bytes(Bytes(SECRET_LEN))?;
-  let user = user::create(
-    &state.connection_pool,
-    &state.user_snowflake,
-    CreateUser {
-      username: &input.username,
-      email: &input.email_address,
-      password_hash: &password_hash,
-      auth_secret,
-      authority: Authority::None,
-    },
-  )
+  let user = user::create(&state.connection_pool, &state.user_snowflake, CreateUser {
+    username: &input.username,
+    email: &input.email_address,
+    password_hash: &password_hash,
+    auth_secret,
+    authority: Authority::None,
+  })
   .await?;
 
   let cookies = authenticate(&state, cookies, &user, *AUTH_DURATION)?;

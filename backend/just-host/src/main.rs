@@ -5,14 +5,14 @@ mod secure;
 mod snowflake;
 
 use crate::secure::Bytes;
-use axum::{middleware, routing, Router};
+use axum::{Router, middleware, routing};
 use config::ConfigError;
 use controllers::user;
 use diesel::{Connection, ConnectionError, PgConnection};
-use diesel_async::pooled_connection::deadpool::{BuildError, Pool};
-use diesel_async::pooled_connection::AsyncDieselConnectionManager;
 use diesel_async::AsyncPgConnection;
-use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
+use diesel_async::pooled_connection::AsyncDieselConnectionManager;
+use diesel_async::pooled_connection::deadpool::{BuildError, Pool};
+use diesel_migrations::{EmbeddedMigrations, MigrationHarness, embed_migrations};
 use fs::filesystem;
 use snowflake::SnowflakeGenerator;
 use std::net::SocketAddr;
@@ -24,7 +24,7 @@ use tokio::task::JoinError;
 use tokio::{select, signal, task};
 use tower_http::services::ServeDir;
 use tower_http::trace::{DefaultMakeSpan, DefaultOnResponse, TraceLayer};
-use tracing::{error, info, Level};
+use tracing::{Level, error, info};
 
 const SECRET_LEN: usize = 32;
 

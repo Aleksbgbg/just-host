@@ -4,8 +4,8 @@ use crate::snowflake::SnowflakeGenerator;
 use diesel::pg::Pg;
 use diesel::sql_types::VarChar;
 use diesel::{
-  define_sql_function, ExpressionMethods, Insertable, OptionalExtension, QueryDsl, Queryable,
-  Selectable, SelectableHelper, TextExpressionMethods,
+  ExpressionMethods, Insertable, OptionalExtension, QueryDsl, Queryable, Selectable,
+  SelectableHelper, TextExpressionMethods, define_sql_function,
 };
 use diesel_async::pooled_connection::deadpool::{Pool, PoolError};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};

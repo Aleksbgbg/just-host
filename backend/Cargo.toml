@@ -1,5 +1,5 @@
 [workspace]
-resolver = "2"
+resolver = "3"
 members = ["fs", "fs-file", "just-host", "tests"]
 
 [profile.release]
