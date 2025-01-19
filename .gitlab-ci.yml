@@ -79,7 +79,9 @@ test-backend:
   variables:
     FF_NETWORK_PER_BUILD: "true"
   script:
-    - apk add --update --no-cache cargo musl-dev libpq-dev
+    - apk add --update --no-cache curl libgcc gcc musl-dev libpq-dev
+    - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    - . "$HOME/.cargo/env"
     - JUST_HOST_HOME="/app/just-host-data" docker compose -f docker/prod/compose.yml up --detach
     - cd backend
     - HOSTNAME=docker PORT=8801 cargo test
