@@ -24,7 +24,10 @@ FROM alpine:latest
 
 WORKDIR /app
 
-RUN apk add --update --no-cache libc++ libpq
+# For some reason the Cargo toolchain on Alpine has started dynamically linking
+# to gcc alongside musl when crt-static is disabled. As a workaround, install
+# libgcc at runtime.
+RUN apk add --update --no-cache libc++ libpq libgcc
 
 COPY --from=backend /backend/target/release/just-host /app/backend
 COPY --from=frontend /frontend/dist /app/frontend
